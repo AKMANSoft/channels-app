@@ -1,9 +1,37 @@
+"use client";
 import Link from "next/link";
+import { useFormik } from "formik";
+import { signIn } from "next-auth/react";
+import * as Yup from "yup";
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
+});
 
 const Signup = () => {
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      console.log("Values: ", values);
+      signIn("credentials", { email: "ali@example.com", password: "1234" });
+    },
+  });
   return (
-    <div className="flex w-screen flex-wrap text-slate-800">
-      <div className="relative hidden h-screen select-none flex-col justify-center bg-blue-600 text-center md:flex md:w-1/2">
+    <div className="flex flex-wrap text-slate-800">
+      <div className="relative hidden min-h-screen flex-col justify-center bg-blue-600 text-center md:flex md:w-1/2">
         <div className="mx-auto py-16 px-8 text-white xl:w-[40rem]">
           <p className="my-6 text-3xl font-semibold leading-10">
             Create and find channels to{" "}
@@ -22,13 +50,13 @@ const Signup = () => {
             Learn More
           </a>
         </div>
-        <img
+        {/* <img
           className="mx-auto w-11/12 max-w-lg rounded-lg object-cover"
-          src="/images/SoOmmtD2P6rjV76JvJTc6.png"
+          src="/images/demo.png"
           alt="Demo Img"
-        />
+        /> */}
       </div>
-      <div className="flex w-full flex-col md:w-1/2 bg-white">
+      <div className="flex w-full flex-col md:w-1/2 bg-white mb-8">
         <div className="flex justify-center pt-12 md:justify-start md:pl-12">
           <Link href="/" className="text-2xl font-bold text-blue-600">
             {" "}
@@ -61,45 +89,128 @@ const Signup = () => {
               Or use email instead
             </div>
           </div>
-          <form className="flex flex-col items-stretch pt-3 md:pt-8">
-            <div className="flex flex-col pt-4">
-              <div className="relative flex overflow-hidden">
+          <form
+            className="flex flex-col items-stretch pt-3 md:pt-8"
+            onSubmit={formik.handleSubmit}
+          >
+            <div className="mb-4">
+              <div className="flex justify-between">
+                <label
+                  className="mb-2 inline-block text-xs font-medium uppercase text-gray-700"
+                  htmlFor="name"
+                >
+                  Name
+                </label>
+              </div>
+              <div className="relative flex w-full flex-wrap items-stretch">
                 <input
                   type="text"
-                  id="login-name"
-                  className="block w-full cursor-text appearance-none rounded-md border border-gray-400 py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow"
-                  placeholder="Name"
+                  id="name"
+                  className={`relative block flex-auto cursor-text appearance-none rounded-md border ${
+                    formik.touched.name && formik.errors.name
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  } py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow`}
+                  name="name"
+                  placeholder="Ali Muhammad"
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
                 />
               </div>
+              {formik.touched.name && formik.errors.name && (
+                <div className="text-red-600">{formik.errors.name}</div>
+              )}
             </div>
-            <div className="flex flex-col pt-4">
-              <div className="relative flex overflow-hidden">
+            <div className="mb-4">
+              <div className="flex justify-between">
+                <label
+                  className="mb-2 inline-block text-xs font-medium uppercase text-gray-700"
+                  htmlFor="email"
+                >
+                  Email
+                </label>
+              </div>
+              <div className="relative flex w-full flex-wrap items-stretch">
                 <input
-                  type="email"
-                  id="login-email"
-                  className="block w-full cursor-text appearance-none rounded-md border border-gray-400 py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow"
-                  placeholder="Email"
+                  type="text"
+                  id="email"
+                  className={`relative block flex-auto cursor-text appearance-none rounded-md border ${
+                    formik.touched.email && formik.errors.email
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  } py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow`}
+                  name="email"
+                  placeholder="ali@example.com"
+                  onChange={formik.handleChange}
+                  value={formik.values.email}
                 />
               </div>
+              {formik.touched.email && formik.errors.email && (
+                <div className="text-red-600">{formik.errors.email}</div>
+              )}
             </div>
-            <div className="mb-4 flex flex-col pt-4">
-              <div className="relative flex overflow-hidden">
+            <div className="mb-4">
+              <div className="flex justify-between">
+                <label
+                  className="mb-2 inline-block text-xs font-medium uppercase text-gray-700"
+                  htmlFor="password"
+                >
+                  Password
+                </label>
+              </div>
+              <div className="relative flex w-full flex-wrap items-stretch">
                 <input
                   type="password"
-                  id="login-password"
-                  className="block w-full cursor-text appearance-none rounded-md border border-gray-400 py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow"
-                  placeholder="Password (minimum 8 characters)"
+                  id="password"
+                  className={`relative block flex-auto cursor-text appearance-none rounded-md border ${
+                    formik.touched.password && formik.errors.password
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  } py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow`}
+                  name="password"
+                  placeholder="Password"
+                  onChange={formik.handleChange}
+                  value={formik.values.password}
                 />
               </div>
+              {formik.touched.password && formik.errors.password && (
+                <div className="text-red-600">{formik.errors.password}</div>
+              )}
+            </div>
+            <div className="mb-4">
+              <div className="flex justify-between">
+                <label
+                  className="mb-2 inline-block text-xs font-medium uppercase text-gray-700"
+                  htmlFor="confirm-password"
+                >
+                  Confirm Password
+                </label>
+              </div>
+              <div className="relative flex w-full flex-wrap items-stretch">
+                <input
+                  type="password"
+                  id="confirm-password"
+                  className={`relative block flex-auto cursor-text appearance-none rounded-md border ${
+                    formik.touched.confirmPassword && formik.errors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  } py-2 px-3 text-sm outline-none focus:border-indigo-500 focus:bg-white focus:text-gray-600 focus:shadow`}
+                  name="confirmPassword"
+                  placeholder="Password"
+                  onChange={formik.handleChange}
+                  value={formik.values.confirmPassword}
+                />
+              </div>
+              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                <div className="text-red-600">{formik.errors.confirmPassword}</div>
+              )}
             </div>
             <div className="block">
               <input
                 className="mr-2 h-5 w-5 appearance-none rounded border border-gray-300 bg-contain bg-no-repeat align-top text-black shadow checked:bg-blue-600 focus:border-blue-600 focus:shadow"
                 type="checkbox"
                 id="remember-me"
-                style={{
-                  backgroundImage: `url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10l3 3l6-6'/%3e%3c/svg%3e&quot;)`,
-                }}
+                name="rememberMe"
                 defaultChecked
               />
               <label className="inline-block" htmlFor="remember-me">
