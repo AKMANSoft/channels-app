@@ -1,4 +1,19 @@
+"use client"
+import socket from "@/socket";
+import { useStore } from "@/store";
+import { useEffect } from "react";
+
 export default function Messages() {
+  const { messages, addMessage } = useStore();
+  console.log("messages", messages)
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+    })
+    return () => {}
+  }, [])
+
   return (
     <div className="flex justify-between">
       <div className="w-1/4">
