@@ -55,7 +55,7 @@ export default function Messages() {
               <li key={item.id}>
                 <Link
                   className={`flex ${
-                    pathname ===`/dashboard/messages/${item.id}` ? "bg-slate-100" : "hover:bg-slate-100"
+                    pathname ===`/dashboard/messages/c/${item.id}` ? "bg-slate-100" : "hover:bg-slate-100"
                   } w-full space-x-2 rounded-md px-10 py-4`}
                   href={`/dashboard/messages/c/${item.id}`}
                 >
